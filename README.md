@@ -1,126 +1,105 @@
-🏦 Trading Engine – Order Book Implementation
-📌 Overview
+# 🏦 Trading Engine – Limit Order Book Implementation
 
-This project is a simplified Trading Engine Server written in C# (.NET) featuring a fully functional Limit Order Book implementation.
+## 📌 Overview
 
-It simulates the core behavior of an exchange matching engine:
+This project implements a simplified **Trading Engine Server** in **C# (.NET)** featuring a fully functional **Limit Order Book**.
 
-Accepting buy and sell limit orders
+The engine simulates the core behavior of a financial exchange by:
 
-Matching orders based on price-time priority
+- Accepting buy and sell limit orders
+- Matching orders using **price-time priority**
+- Maintaining bid and ask books
+- Generating match results
 
-Maintaining bid/ask book structure
+This project demonstrates understanding of trading system mechanics, data structures, clean architecture, and backend engineering principles.
 
-Producing match results
+---
 
-The goal of this project is to demonstrate understanding of:
-
-Data structures
-
-Matching engine logic
-
-Clean architecture design
-
-Multithreading (logging / background services)
-
-Dependency Injection using Microsoft.Extensions.Hosting
-
-🧠 Architecture
+## 🧠 Architecture
 
 The solution is structured into multiple projects:
 
-1️⃣ TradingEngine (Host Project)
+### 🔹 TradingEngine (Host)
+- Console application
+- Configures dependency injection
+- Bootstraps the matching engine using `IHost`
+- Handles configuration via `appsettings.json`
 
-Console application
-
-Configures services
-
-Bootstraps the engine using IHost
-
-Handles dependency injection
-
-2️⃣ OrderBookCS (Core Matching Logic)
+### 🔹 OrderBookCS (Core Matching Logic)
 
 Contains:
 
-Order
+- `Order`
+- `OrderBook`
+- `Limit`
+- `OrderBookEntry`
+- `MatchResult`
 
-OrderBook
+Interfaces:
 
-Limit
-
-OrderBookEntry
-
-MatchResult
-
-IOrderEntryOrderBook
-
-IMatchingOrderBook
-
-IReadOnlyOrderBook
+- `IOrderEntryOrderBook`
+- `IMatchingOrderBook`
+- `IReadOnlyOrderBook`
 
 Implements:
+- Price-time priority
+- Bid/Ask separation
+- Linked-list structure per price level
+- Efficient insertion and removal of orders
 
-Price-time priority
+### 🔹 LoggingCS
 
-Bid/Ask separation
+Custom logging system featuring:
 
-Order matching
+- Asynchronous logging queue
+- Configurable logger types
+- File-based logging
+- JSON configuration binding
+- Hosted background service integration
 
-Linked-list structure inside price levels
+---
 
-3️⃣ LoggingCS
+## ⚙️ Matching Rules
 
-Custom logging system with:
+The engine follows standard exchange logic:
 
-Configurable logger types
+- Buy orders match with the **lowest available ask**
+- Sell orders match with the **highest available bid**
+- Orders match if:
+  - Buy price ≥ best ask
+  - Sell price ≤ best bid
+- FIFO priority within the same price level
 
-Async log queue
+---
 
-File-based logging
+## 📈 Example
 
-JSON configuration support
+| Order ID | Side | Price | Quantity |
+|----------|------|-------|----------|
+| 1        | Buy  | 100   | 10       |
+| 2        | Sell | 100   | 5        |
 
-⚙️ Features
+**Result:**
 
-✅ Limit order submission
+- Trade executed at 100
+- Buy order remains with quantity 5
+- Sell order fully filled
 
-✅ Order matching engine
+---
 
-✅ Price-time priority
+## 🚀 How to Run
 
-✅ Separate bid and ask books
+1. Clone the repository
+2. Open the solution in Visual Studio
+3. Build the solution
+4. Run the `TradingEngine` project
 
-✅ Order cancellation support (if implemented)
+---
 
-✅ Match result generation
+## 🧪 Testing Example
 
-✅ Configurable logging system
+You can test the engine by adding sample orders in `Program.cs`:
 
-✅ Hosted background service architecture
-
- Order Book Design
-
-The matching engine follows standard exchange rules:
-
-Matching Rules
-
-Buy orders match against lowest available ask
-
-Sell orders match against highest available bid
-
-Orders match if:
-
-Buy price ≥ best ask
-
-Sell price ≤ best bid
-
-FIFO within the same price level
-
-Data Structures
-
-Dictionary / SortedDictionary for price levels
-
-Linked list per price level (time priority)
-
-Efficient insertion and removal
+```csharp
+orderBook.AddOrder(new Order(1, Side.Buy, 100, 10));
+orderBook.AddOrder(new Order(2, Side.Sell, 100, 5));
